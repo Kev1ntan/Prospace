@@ -28,6 +28,12 @@
   color: #61dafb;
 }
 
+#phoneCode {
+  width: 50px;
+  background-color: transparent;
+  height: 38px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

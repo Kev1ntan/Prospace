@@ -1,6 +1,6 @@
 import {createStore, combineReducers} from 'redux'
 const initialState = {
-  companies: [{ name: "a", address: "b", revenue: "c", offices: [], phone: "(d e)" }],
+  companies: [{ id: 1, name: "sa", address: "sa", revenue: "32", offices: [], phone: "(3) 3" },{ id: 2, name: "sa", address: "sa", revenue: "32", offices: [], phone: "(3) 3" }],
 }
 
 function companiesReducer(state = initialState, action){
@@ -9,9 +9,16 @@ function companiesReducer(state = initialState, action){
       console.log(action.payload)
       return {...state,companies: [...state.companies,action.payload]}
     case "addOffice":
-      return {...state,company: []}
+      let filterCompanies = state.companies.filter(company => company.id != action.id)
+      let findCompany= state.companies.filter(company => company.id == action.id)
+      let updatedCompany = {...findCompany[0],offices: [...findCompany[0].offices,action.payload]}
+      let mergedCompanies = [...filterCompanies,updatedCompany]
+      let sortCompanies = mergedCompanies.sort(function(a,b){return a.id-b.id})
+      console.log(filterCompanies,findCompany,updatedCompany,sortCompanies,action.id)
+      return {...state,companies: sortCompanies}
     case "deleteCompany":
-      return {...state,company: []}
+      let newCompanies = state.companies.filter(company => company.id !== action.id)
+      return {...state,companies: newCompanies}
     case "deleteOffice":
       return {...state,company: []}
     default:

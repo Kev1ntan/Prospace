@@ -1,5 +1,6 @@
 import React, {useRef} from "react";
 import {useStore, useDispatch, useSelector} from "react-redux"
+import PhoneCode from 'react-phone-code'
 import {
   Button,
   Form,
@@ -9,25 +10,40 @@ import {
 
 const style = {
   title: {
-    'fontSize': '20px',
+    'fontSize': '22px',
   },
   label: {
     'fontSize': '14px',
     'fontWeight': 'bold'
   },
   input: {
-    width: '400px',
+    width: '350px',
   },
   number: {
-    width: '325px'
+    width: '230px'
   },
   code: {
     marginRight: '5px',
-    width: '70px'
+    width: '65px'
   },
   location: {
-    width: '195px'
-  }
+    width: '170px'
+  },
+  select: {
+    height: '38px',
+    borderRadius: '5px',
+    border: '1px solid #ced4da',
+    backgroundColor: 'transparent',
+    width: '350px'
+  },
+  button: {
+    marginTop: '15px',
+    marginBottom: '25px',
+    border: 'none',
+    color: 'black',
+    width: '350px',
+    backgroundColor: '#ced4da',
+  },
 }
 
 export default function FormComponent(props) {
@@ -42,8 +58,11 @@ export default function FormComponent(props) {
   const [officeLongitude, setOfficeLongitude] = React.useState('')
   const [officeLatitude, setOfficeLatitude] = React.useState('')
   const [officeStartDate, setOfficeStartDate] = React.useState('')
-  const [company, setCompany] = React.useState('')
+  const [companyId, setCompanyId] = React.useState('')
+  const [defaultCode, setDefaultCode] = React.useState('select country')
 
+
+  const dropdown = useSelector(state=>state.companiesReducer.companies)
   const [showCompanyNameToolTipMessage, setShowCompanyNameToolTipMessage] = React.useState(false)
   const [showCompanyAddressToolTipMessage, setShowCompanyAddressToolTipMessage] = React.useState(false)
   const [showCompanyRevenueToolTipMessage, setShowCompanyRevenueToolTipMessage] = React.useState(false)
@@ -82,10 +101,10 @@ export default function FormComponent(props) {
 
   console.log('a',props.formName)
   function validate(type) {
-    let message
     let revenue = Math.floor(Number(companyRevenue))
-    let phoneCode = Math.floor(Number(companyPhoneCode))
     let phoneNum = Math.floor(Number(companyPhoneNum))
+    let latitude = Number(officeLatitude)
+    let longitude = Number(officeLongitude)
 
     let valid = true
     if(type === 'company') {
@@ -109,11 +128,7 @@ export default function FormComponent(props) {
         valid = false
       }
       if(companyPhoneCode.trim() === '') {
-        setCompanyPhoneCodeToolTipMessage('Please fill the phone code.')
-        setShowCompanyPhoneCodeToolTipMessage(true)
-        valid = false
-      }else if(phoneCode === Infinity || String(phoneCode) !== companyPhoneCode || phoneCode < 0){
-        setCompanyPhoneCodeToolTipMessage('Phone code must be positive integer.')
+        setCompanyPhoneCodeToolTipMessage('Please select the phone code.')
         setShowCompanyPhoneCodeToolTipMessage(true)
         valid = false
       }else if(companyPhoneNum.trim() === '') {
@@ -127,27 +142,36 @@ export default function FormComponent(props) {
       }
       console.log(companyName,companyAddress,companyPhoneCode,companyPhoneNum,companyRevenue)
     }else if(type === 'office') {
+      console.log(String(officeLatitude),latitude === Infinity , String(officeLatitude).indexOf('.') === -1 , latitude < 0)
       if(officeName.trim() === '') {
         setOfficeNameToolTipMessage('Please fill the name.')
         setShowOfficeNameToolTipMessage(true)
         valid = false
       }
       if(officeLatitude.trim() === '') {
-        setOfficeLatitudeToolTipMessage('Please fill the address.')
+        setOfficeLatitudeToolTipMessage('Please fill the latitude.')
+        setShowOfficeLatitudeToolTipMessage(true)
+        valid = false
+      }else if(latitude === Infinity || String(latitude).indexOf('.') === -1 || latitude < 0){
+        setOfficeLatitudeToolTipMessage('Location latitude must be positive float integer.')
         setShowOfficeLatitudeToolTipMessage(true)
         valid = false
       }else if(officeLongitude.trim() === '') {
-        setOfficeLongitudeToolTipMessage('Please fill the revenue.')
+        setOfficeLongitudeToolTipMessage('Please fill the longitude.')
+        setShowOfficeLongitudeToolTipMessage(true)
+        valid = false
+      }else if(longitude === Infinity || String(longitude).indexOf('.') === -1 || longitude < 0){
+        setOfficeLongitudeToolTipMessage('Location longitude must be positive float integer.')
         setShowOfficeLongitudeToolTipMessage(true)
         valid = false
       }
       if(officeStartDate.trim() === '') {
-        setOfficeStartDateToolTipMessage('Please fill the phone code.')
+        setOfficeStartDateToolTipMessage('Please fill the start date.')
         setShowOfficeStartDateToolTipMessage(true)
         valid = false
       }
-      if(company === 'select company') {
-        setOfficeCompanyNameToolTipMessage('Please fill the phone number.')
+      if(companyId === '') {
+        setOfficeCompanyNameToolTipMessage('Please select the company.')
         setShowOfficeCompanyNameToolTipMessage(true)
         valid = false
       }
@@ -161,8 +185,10 @@ export default function FormComponent(props) {
 
   function submitCompanyForm(e) {
     e.preventDefault()
+    let companies = [...store.getState().companiesReducer.companies]
     if(validate('company').status){
       let data = {
+        id: companies[companies.length-1].id + 1,
         name: companyName,
         address: companyAddress,
         revenue: companyRevenue,
@@ -171,8 +197,7 @@ export default function FormComponent(props) {
       }
       dispatch({type: 'addCompany', payload: data})
       resetForm()
-      console.log(store.getState().companiesReducer.companies)
-    }else{
+      console.log(companies,store.getState().companiesReducer.companies)
     }
   }
 
@@ -186,17 +211,37 @@ export default function FormComponent(props) {
     setOfficeLongitude('')
     setOfficeLatitude('')
     setOfficeStartDate('')
+    setDefaultCode('select country')
   }
   
   function submitOfficeForm(e) {
     e.preventDefault()
-    console.log(officeName,officeLatitude,officeLongitude,company,)
+    let companies = [...store.getState().companiesReducer.companies]
+    let findCompany = companies.filter(company => company.id == companyId)
+    console.log(officeName,officeLatitude,officeLongitude,companyId,officeStartDate,findCompany,companies,companyId)
+    let officeId
+    if(findCompany[0].offices.length === 0){
+      officeId = 0
+    }else{
+      officeId = findCompany[0].offices[findCompany[0].offices.length-1].id + 1
+    }
+    if(validate('office').status){
+      let officeData = {
+        id: officeId,
+        name: officeName,
+        latitude: officeLatitude,
+        longitude: officeLongitude,
+        startDate: officeStartDate
+      }
+      dispatch({type: 'addOffice', payload: officeData, id: companyId})
+      resetForm()
+    }
   }
   function renderForm() {
     if(props.formName === 'company'){
       return (
       <Form onSubmit={submitCompanyForm}>
-        <Form.Label style={style.title}>Create Company</Form.Label>
+        <Form.Label style={style.title}>Create Company</Form.Label><br></br>
         <Form.Label style={style.label}>Name:</Form.Label>
         <Form.Control
           ref={companyNameTarget}
@@ -250,15 +295,20 @@ export default function FormComponent(props) {
         </Overlay>
         <Form.Label style={style.label}>Phone No:</Form.Label>
         <div style={{display: 'flex'}}>
+          <div ref={companyPhoneCodeTarget} onClick={() => setShowCompanyPhoneCodeToolTipMessage(false)}>
+            <PhoneCode
+              onSelect={code => setCompanyPhoneCode(code)}
+              defaultValue={defaultCode}
+              id='phoneCode'
+            />
+          </div>
           <div>
             <Form.Control
-              ref={companyPhoneCodeTarget}
-              onClick={() => setShowCompanyPhoneCodeToolTipMessage(false)}
-              onChange={(e) => setCompanyPhoneCode(e.target.value)}
               value={companyPhoneCode}
               style={style.code}
               type="text"
               placeholder="code"
+              disabled
             />
             <Overlay target={companyPhoneCodeTarget.current} show={showCompanyPhoneCodeToolTipMessage} placement="bottom">
               {(props) => (
@@ -287,12 +337,12 @@ export default function FormComponent(props) {
             </Overlay>
           </div>
         </div>
-        <Button type='submit' variant="secondary">Create</Button>
+        <Button style={style.button} type='submit' variant="secondary">Create</Button>
       </Form>)
     }else if(props.formName === 'office') {
       return (
       <Form onSubmit={submitOfficeForm}>
-        <Form.Label style={style.title}>Create Office</Form.Label>
+        <Form.Label style={style.title}>Create Office</Form.Label><br></br>
         <Form.Label style={style.label}>Name:</Form.Label>
         <Form.Control
           ref={officeNameTarget}
@@ -356,7 +406,7 @@ export default function FormComponent(props) {
           onChange={(e) => setOfficeStartDate(e.target.value)}
           value={officeStartDate}
           style={style.input}
-          type="text"
+          type="date"
           placeholder="date"
         />
         <Overlay target={officeStartDateTarget.current} show={showOfficeStartDateToolTipMessage} placement="bottom">
@@ -367,34 +417,35 @@ export default function FormComponent(props) {
           )}
         </Overlay>
         <Form.Label style={style.label}>Company:</Form.Label>
-        <select
-          ref={officeCompanyNameTarget}
-          onChange={e => setCompany(e.target.value)}
-          placeholder="select company"
-          required
-        >
-          {
-          console.log(store.getState().companiesReducer.companies,"<")
-          }
-          {
-            store.getState().companiesReducer.companies.map(mappedCompany=>{
-              console.log(mappedCompany)
-              return (
-                <option value={mappedCompany.name}>
-                  {mappedCompany.name}
-                </option>
-                )
-            })
-          }
-        </select>
-        <Overlay target={officeCompanyNameTarget.current} show={showOfficeCompanyNameToolTipMessage} placement="bottom">
-          {(props) => (
-            <Tooltip id="overlay-example" {...props}>
-              {officeCompanyNameToolTipMessage}
-            </Tooltip>
-          )}
-        </Overlay>
-        <Button type='submit' variant="secondary">Create</Button>
+        <div style={style.dropdown}>
+          <select
+            style={style.select}
+            ref={officeCompanyNameTarget}
+            onChange={e => setCompanyId(e.target.value)}
+          >
+            <option selected disabled>
+              select company
+            </option>
+            {
+              dropdown.map(mappedCompany=>{
+                console.log(mappedCompany)
+                return (
+                  <option value={mappedCompany.id}>
+                    {mappedCompany.name}
+                  </option>
+                  )
+              })
+            }
+          </select>
+          <Overlay target={officeCompanyNameTarget.current} show={showOfficeCompanyNameToolTipMessage} placement="bottom">
+            {(props) => (
+              <Tooltip id="overlay-example" {...props}>
+                {officeCompanyNameToolTipMessage}
+              </Tooltip>
+            )}
+          </Overlay>
+        </div>
+        <Button style={style.button} type='submit' variant="secondary">Create</Button>
       </Form>)
     }
   }
