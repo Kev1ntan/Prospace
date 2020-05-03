@@ -5,9 +5,21 @@ import {
   Card
 } from '../components'
 
+let styles = {
+  container: {
+    minHeight: '1000px',
+    maxWidth: '750px',
+    border: '1px solid #ced4da',
+    borderRadius: '5px',
+    margin: 'auto',
+    marginTop:'5px'
+  },
+}
+
+
 export default function OverviewPage() {
   let store = useStore()
-  useSelector(state=>state)
+  useSelector(state=>state.companiesReducer.companies)
   function checkCompanies() {
     if(store.getState().companiesReducer.companies.length === 0) {
       return (<h4>there is no companies created yet.</h4>)
@@ -19,7 +31,7 @@ export default function OverviewPage() {
   }
   console.log('ref')
   return (
-    <div style={{textAlign: 'left', maxWidth: '750px'}}>
+    <div style={styles.container}>
       <div style={{display: 'flex', justifyContent: 'space-between', margin: '10px'}}>
         <Form formName='company'/>
         <div style={{borderLeft: '1px solid #ced4da'}}></div>

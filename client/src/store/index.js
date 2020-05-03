@@ -1,6 +1,7 @@
 import {createStore, combineReducers} from 'redux'
 const initialState = {
   companies: [{ id: 1, name: "sa", address: "sa", revenue: "32", offices: [], phone: "(3) 3" },{ id: 2, name: "sa", address: "sa", revenue: "32", offices: [], phone: "(3) 3" }],
+  currentCompany:{}
 }
 
 function companiesReducer(state = initialState, action){
@@ -8,6 +9,10 @@ function companiesReducer(state = initialState, action){
     case "addCompany":
       console.log(action.payload)
       return {...state,companies: [...state.companies,action.payload]}
+    case "setCompany":
+      console.log(action.payload)
+      let setCompany = state.companies.filter(company => company.id == action.id)
+      return {...state,currentCompany: setCompany[0]}
     case "addOffice":
       let filterCompanies = state.companies.filter(company => company.id != action.id)
       let findCompany= state.companies.filter(company => company.id == action.id)
@@ -17,10 +22,17 @@ function companiesReducer(state = initialState, action){
       console.log(filterCompanies,findCompany,updatedCompany,sortCompanies,action.id)
       return {...state,companies: sortCompanies}
     case "deleteCompany":
-      let newCompanies = state.companies.filter(company => company.id !== action.id)
+      let newCompanies = state.companies.filter(company => company.id !== action.companyId)
       return {...state,companies: newCompanies}
     case "deleteOffice":
-      return {...state,company: []}
+      let filteredCompanies = state.companies.filter(company => company.id != action.companyId)
+      let foundCompany= state.companies.filter(company => company.id == action.companyId)
+      let filterOffice = foundCompany[0].offices.filter(office => office.id != action.officeId)
+      let updateCompany = {...foundCompany[0],offices: filterOffice}
+      let mergeCompanies = [...filteredCompanies,updateCompany]
+      let sortedCompanies = mergeCompanies.sort(function(a,b){return a.id-b.id})
+      console.log(action.companyId,action.officeId)
+      return {...state,companies: sortedCompanies}
     default:
       return state
   }

@@ -1,5 +1,6 @@
 import React, {useRef} from "react";
 import {useStore, useDispatch, useSelector} from "react-redux"
+import Swal from 'sweetalert2'
 import PhoneCode from 'react-phone-code'
 import {
   Button,
@@ -8,7 +9,7 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 
-const style = {
+const styles = {
   title: {
     'fontSize': '22px',
   },
@@ -197,6 +198,15 @@ export default function FormComponent(props) {
       }
       dispatch({type: 'addCompany', payload: data})
       resetForm()
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        text: `${companyName} company has been created.`,
+        timerProgressBar:true,
+        showConfirmButton: false,
+        width: 150,
+        timer: 2000
+      })
       console.log(companies,store.getState().companiesReducer.companies)
     }
   }
@@ -235,19 +245,28 @@ export default function FormComponent(props) {
       }
       dispatch({type: 'addOffice', payload: officeData, id: companyId})
       resetForm()
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        text: `${officeName} office has been created.`,
+        timerProgressBar:true,
+        showConfirmButton: false,
+        width: 150,
+        timer: 2000
+      })
     }
   }
   function renderForm() {
     if(props.formName === 'company'){
       return (
       <Form onSubmit={submitCompanyForm}>
-        <Form.Label style={style.title}>Create Company</Form.Label><br></br>
-        <Form.Label style={style.label}>Name:</Form.Label>
+        <Form.Label style={styles.title}>Create Company</Form.Label><br></br>
+        <Form.Label style={styles.label}>Name:</Form.Label>
         <Form.Control
           ref={companyNameTarget}
           onClick={() => setShowCompanyNameToolTipMessage(false)}
           onChange={(e) => setCompanyName(e.target.value)}
-          style={style.input}
+          style={styles.input}
           value={companyName}
           type="text"
           placeholder="name"
@@ -259,13 +278,13 @@ export default function FormComponent(props) {
             </Tooltip>
           )}
         </Overlay>
-        <Form.Label style={style.label}>Address:</Form.Label>
+        <Form.Label style={styles.label}>Address:</Form.Label>
         <Form.Control
           ref={companyAddressTarget}
           onClick={() => setShowCompanyAddressToolTipMessage(false)}
           onChange={(e) => setCompanyAddress(e.target.value)}
           value={companyAddress}
-          style={style.input}
+          style={styles.input}
           type="text"
           placeholder="address"
         />
@@ -276,13 +295,13 @@ export default function FormComponent(props) {
             </Tooltip>
           )}
         </Overlay>
-        <Form.Label style={style.label}>Revenue:</Form.Label>
+        <Form.Label style={styles.label}>Revenue:</Form.Label>
         <Form.Control
           ref={companyRevenueTarget}
           onClick={() => setShowCompanyRevenueToolTipMessage(false)}
           onChange={(e) => setCompanyRevenue(e.target.value)}
           value={companyRevenue}
-          style={style.input}
+          style={styles.input}
           type="text"
           placeholder="revenue"
         />
@@ -293,7 +312,7 @@ export default function FormComponent(props) {
             </Tooltip>
           )}
         </Overlay>
-        <Form.Label style={style.label}>Phone No:</Form.Label>
+        <Form.Label style={styles.label}>Phone No:</Form.Label>
         <div style={{display: 'flex'}}>
           <div ref={companyPhoneCodeTarget} onClick={() => setShowCompanyPhoneCodeToolTipMessage(false)}>
             <PhoneCode
@@ -305,7 +324,7 @@ export default function FormComponent(props) {
           <div>
             <Form.Control
               value={companyPhoneCode}
-              style={style.code}
+              style={styles.code}
               type="text"
               placeholder="code"
               disabled
@@ -324,7 +343,7 @@ export default function FormComponent(props) {
               onClick={() => setShowCompanyPhoneNumToolTipMessage(false)}
               onChange={(e) => setCompanyPhoneNum(e.target.value)}
               value={companyPhoneNum}
-              style={style.number}
+              style={styles.number}
               type="text"
               placeholder="number"
             />
@@ -337,19 +356,19 @@ export default function FormComponent(props) {
             </Overlay>
           </div>
         </div>
-        <Button style={style.button} type='submit' variant="secondary">Create</Button>
+        <Button style={styles.button} type='submit' variant="secondary">Create</Button>
       </Form>)
     }else if(props.formName === 'office') {
       return (
       <Form onSubmit={submitOfficeForm}>
-        <Form.Label style={style.title}>Create Office</Form.Label><br></br>
-        <Form.Label style={style.label}>Name:</Form.Label>
+        <Form.Label style={styles.title}>Create Office</Form.Label><br></br>
+        <Form.Label style={styles.label}>Name:</Form.Label>
         <Form.Control
           ref={officeNameTarget}
           onClick={() => setShowOfficeNameToolTipMessage(false)}
           onChange={(e) => setOfficeName(e.target.value)}
           value={officeName}
-          style={style.input}
+          style={styles.input}
           type="text"
           placeholder="name"
         />
@@ -360,7 +379,7 @@ export default function FormComponent(props) {
             </Tooltip>
           )}
         </Overlay>
-        <Form.Label style={style.label}>Location:</Form.Label>
+        <Form.Label style={styles.label}>Location:</Form.Label>
         <div style={{display: 'flex'}}>
           <div style={{marginRight: '10px'}}>
             <Form.Control
@@ -368,7 +387,7 @@ export default function FormComponent(props) {
               onClick={() => setShowOfficeLatitudeToolTipMessage(false)}
               onChange={(e) => setOfficeLatitude(e.target.value)}
               value={officeLatitude}
-              style={style.location}
+              style={styles.location}
               type="text"
               placeholder="latitude"
             />
@@ -386,7 +405,7 @@ export default function FormComponent(props) {
               onClick={() => setShowOfficeLongitudeToolTipMessage(false)}
               onChange={(e) => setOfficeLongitude(e.target.value)}
               value={officeLongitude}
-              style={style.location}
+              style={styles.location}
               type="text"
               placeholder="longitude"
             />
@@ -399,13 +418,13 @@ export default function FormComponent(props) {
             </Overlay>
           </div>
         </div>
-        <Form.Label style={style.label}>Office Start Date:</Form.Label>
+        <Form.Label style={styles.label}>Office Start Date:</Form.Label>
         <Form.Control
           ref={officeStartDateTarget}
           onClick={() => setShowOfficeStartDateToolTipMessage(false)}
           onChange={(e) => setOfficeStartDate(e.target.value)}
           value={officeStartDate}
-          style={style.input}
+          style={styles.input}
           type="date"
           placeholder="date"
         />
@@ -416,10 +435,10 @@ export default function FormComponent(props) {
             </Tooltip>
           )}
         </Overlay>
-        <Form.Label style={style.label}>Company:</Form.Label>
-        <div style={style.dropdown}>
+        <Form.Label style={styles.label}>Company:</Form.Label>
+        <div style={styles.dropdown}>
           <select
-            style={style.select}
+            style={styles.select}
             ref={officeCompanyNameTarget}
             onChange={e => setCompanyId(e.target.value)}
           >
@@ -445,7 +464,7 @@ export default function FormComponent(props) {
             )}
           </Overlay>
         </div>
-        <Button style={style.button} type='submit' variant="secondary">Create</Button>
+        <Button style={styles.button} type='submit' variant="secondary">Create</Button>
       </Form>)
     }
   }

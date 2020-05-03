@@ -18,8 +18,11 @@ function App() {
       <div className="App">
         <Router>
           <Switch>
-            <Route path='/'>
+            <Route exact path='/'>
               <OverviewPage/>
+            </Route>
+            <Route path='/companyDetail/:id/:name'>
+              <OfficePage/>
             </Route>
           </Switch>
         </Router>
