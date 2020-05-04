@@ -77,7 +77,6 @@ export default function CardComponent(props) {
               timer: 2000
             })
           })
-        
       }
     })
   }
@@ -100,6 +99,7 @@ export default function CardComponent(props) {
           .then(resp=>{
             console.log(resp)
             dispatch({type: 'deleteOffice', payload: resp.data})
+            dispatch({type:'setCompany', id})
             Swal.fire({
               toast: true,
               position: 'top',

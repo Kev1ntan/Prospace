@@ -14,7 +14,7 @@ import axios from 'axios'
 const baseUrl = 'http://localhost:3001/'
 let styles = {
   container: {
-    minHeight: '1000px',
+    minHeight: '800px',
     maxWidth: '750px',
     border: '1px solid #ced4da',
     borderRadius: '5px',

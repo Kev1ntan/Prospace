@@ -5,6 +5,7 @@ cd Prospace
 cd server
 npm i
 touch .env (see the env-template format example and fill the data, for PORT use 3001)
+sequelize db:create
 sequelize db:migrate
 setup server finish... to run the server type npm run dev
 

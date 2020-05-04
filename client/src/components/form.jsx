@@ -479,7 +479,6 @@ export default function FormComponent(props) {
             </option>
             {
               dropdown.map(mappedCompany=>{
-                console.log(mappedCompany)
                 return (
                   <option value={mappedCompany.id}>
                     {mappedCompany.name}
