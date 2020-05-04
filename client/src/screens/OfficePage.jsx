@@ -10,6 +10,8 @@ import {
 import {
   Button,
 } from 'react-bootstrap';
+import axios from 'axios'
+const baseUrl = 'http://localhost:3001/'
 let styles = {
   container: {
     minHeight: '1000px',
@@ -37,10 +39,11 @@ export default function OfficePage() {
   let dispatch = useDispatch()
   let store = useStore()
   let {id,name} = useParams()
+
   useSelector(state=>state.companiesReducer.companies)
   function checkCompany() {
-    dispatch({type:'setCompany', id})
     let company = store.getState().companiesReducer.currentCompany
+    console.log(company)
     return (
       <div style={{textAlign: 'left', margin: '10px'}}>
         <h1 style={{borderBottom: '1px solid #ced4da'}}>{name}</h1>
@@ -73,7 +76,7 @@ export default function OfficePage() {
     )
     function checkOffice() {
       let company = store.getState().companiesReducer.currentCompany
-      if(company.offices.length === 0) {
+      if(company.Offices.length === 0) {
         return (
           <h4>There is no office created yet.</h4>
         )

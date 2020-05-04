@@ -8,6 +8,8 @@ import {
 import {
   Card
 } from 'react-bootstrap';
+import axios from 'axios'
+const baseUrl = 'http://localhost:3001/'
 
 let styles = {
   subtitle: {
@@ -58,16 +60,24 @@ export default function CardComponent(props) {
       confirmButtonText: 'Yes'
     }).then((result) => {
       if (result.value) {
-        dispatch({type: 'deleteCompany', companyId})
-        Swal.fire({
-          toast: true,
-          position: 'top',
-          text: `${name} company has been deleted.`,
-          timerProgressBar:true,
-          showConfirmButton: false,
-          width: 150,
-          timer: 2000
+        axios({
+          url: `${baseUrl}deleteCompany/${companyId}`,
+          method: 'DELETE',
         })
+          .then(resp=>{
+            console.log(resp)
+            dispatch({type: 'deleteCompany', payload: resp.data})
+            Swal.fire({
+              toast: true,
+              position: 'top',
+              text: `${name} company has been deleted.`,
+              timerProgressBar:true,
+              showConfirmButton: false,
+              width: 150,
+              timer: 2000
+            })
+          })
+        
       }
     })
   }
@@ -83,21 +93,29 @@ export default function CardComponent(props) {
       confirmButtonText: 'Yes'
     }).then((result) => {
       if (result.value) {
-        dispatch({type: 'deleteOffice', companyId: id, officeId})
-        Swal.fire({
-          toast: true,
-          position: 'top',
-          text: `${name} office has been deleted.`,
-          timerProgressBar:true,
-          showConfirmButton: false,
-          width: 150,
-          timer: 2000
+        axios({
+          url: `${baseUrl}deleteOffice/${officeId}`,
+          method: 'DELETE',
         })
+          .then(resp=>{
+            console.log(resp)
+            dispatch({type: 'deleteOffice', payload: resp.data})
+            Swal.fire({
+              toast: true,
+              position: 'top',
+              text: `${name} office has been deleted.`,
+              timerProgressBar:true,
+              showConfirmButton: false,
+              width: 150,
+              timer: 2000
+            })
+          })
       }
     })
   }
 
   function officePage(id,name) {
+    console.log(id,name)
     dispatch({type:'setCompany', id})
     history.push(`/companyDetail/${id}/${name}`)
   }
@@ -144,7 +162,7 @@ export default function CardComponent(props) {
       return (
         <div style={styles.container}>
           {
-            company.offices.map(office=>{
+            company.Offices.map(office=>{
               return (
                 <Card style={styles.officeCard}>
                   <Card.Body style={{paddingTop: '0.5rem'}}>
@@ -165,7 +183,7 @@ export default function CardComponent(props) {
                     </Card.Text>
                     <Card.Subtitle>Office Start Date:</Card.Subtitle>
                     <Card.Text className="mb-2 text-muted">
-                      {office.startDate}
+                      {office.start_date.substring(0,10)}
                     </Card.Text>
                   </Card.Body>
                 </Card>

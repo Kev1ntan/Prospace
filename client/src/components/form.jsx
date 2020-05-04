@@ -1,6 +1,7 @@
 import React, {useRef} from "react";
 import {useStore, useDispatch, useSelector} from "react-redux"
 import Swal from 'sweetalert2'
+import axios from 'axios'
 import PhoneCode from 'react-phone-code'
 import {
   Button,
@@ -8,6 +9,8 @@ import {
   Overlay,
   Tooltip,
 } from 'react-bootstrap';
+
+const baseUrl = 'http://localhost:3001/'
 
 const styles = {
   title: {
@@ -100,7 +103,6 @@ export default function FormComponent(props) {
   const officeStartDateTarget = useRef(null)
   const officeCompanyNameTarget = useRef(null)
 
-  console.log('a',props.formName)
   function validate(type) {
     let revenue = Math.floor(Number(companyRevenue))
     let phoneNum = Math.floor(Number(companyPhoneNum))
@@ -186,31 +188,45 @@ export default function FormComponent(props) {
 
   function submitCompanyForm(e) {
     e.preventDefault()
+    console.log(store.getState().companiesReducer.companies)
     let companies = [...store.getState().companiesReducer.companies]
     if(validate('company').status){
       let data = {
-        id: companies[companies.length-1].id + 1,
+        // id: companies[companies.length-1].id + 1,
         name: companyName,
         address: companyAddress,
         revenue: companyRevenue,
-        offices: [],
+        // offices: [],
         phone: `(${companyPhoneCode}) ${companyPhoneNum}`
       }
-      dispatch({type: 'addCompany', payload: data})
       resetForm()
-      Swal.fire({
-        toast: true,
-        position: 'top',
-        text: `${companyName} company has been created.`,
-        timerProgressBar:true,
-        showConfirmButton: false,
-        width: 150,
-        timer: 2000
+      axios({
+        url: `${baseUrl}addCompany`,
+        method: 'POST',
+        data
       })
-      console.log(companies,store.getState().companiesReducer.companies)
-    }
+        .then(resp=>{
+          console.log("added")
+          console.log(resp)
+          dispatch({type: 'addCompany', payload: resp.data})
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            text: `${companyName} company has been created.`,
+            timerProgressBar:true,
+            showConfirmButton: false,
+            width: 150,
+            timer: 2000
+          })
+        })
+        .catch(error=>{
+          console.log("error")
+          console.log(error.response)
+        })
+        console.log(companies,store.getState().companiesReducer.companies)
+      }
   }
-
+    
   function resetForm() {
     setCompanyName('')
     setCompanyAddress('')
@@ -223,37 +239,53 @@ export default function FormComponent(props) {
     setOfficeStartDate('')
     setDefaultCode('select country')
   }
-  
+    
   function submitOfficeForm(e) {
     e.preventDefault()
-    let companies = [...store.getState().companiesReducer.companies]
-    let findCompany = companies.filter(company => company.id == companyId)
-    console.log(officeName,officeLatitude,officeLongitude,companyId,officeStartDate,findCompany,companies,companyId)
-    let officeId
-    if(findCompany[0].offices.length === 0){
-      officeId = 0
-    }else{
-      officeId = findCompany[0].offices[findCompany[0].offices.length-1].id + 1
-    }
+    console.log(officeStartDate)
+    // let companies = [...store.getState().companiesReducer.companies]
+    // let findCompany = companies.filter(company => company.id == companyId)
+    // console.log(officeName,officeLatitude,officeLongitude,companyId,officeStartDate,findCompany,companies,companyId)
+    // let officeId
+    // if(findCompany[0].offices.length === 0){
+    //   officeId = 0
+    // }else{
+    //   officeId = findCompany[0].offices[findCompany[0].offices.length-1].id + 1
+    // }
     if(validate('office').status){
       let officeData = {
-        id: officeId,
+        // id: officeId,
         name: officeName,
         latitude: officeLatitude,
         longitude: officeLongitude,
-        startDate: officeStartDate
+        start_date: officeStartDate,
+        CompanyId: companyId
       }
-      dispatch({type: 'addOffice', payload: officeData, id: companyId})
+      // dispatch({type: 'addOffice', payload: officeData, id: companyId})
       resetForm()
-      Swal.fire({
-        toast: true,
-        position: 'top',
-        text: `${officeName} office has been created.`,
-        timerProgressBar:true,
-        showConfirmButton: false,
-        width: 150,
-        timer: 2000
+      axios({
+        url: `${baseUrl}addOffice`,
+        method: 'POST',
+        data: officeData
       })
+        .then(resp=>{
+          console.log("added")
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            text: `${officeName} office has been created.`,
+            timerProgressBar:true,
+            showConfirmButton: false,
+            width: 150,
+            timer: 2000
+          })
+          console.log(resp)
+          dispatch({type: 'addOffice', payload: resp.data})
+        })
+        .catch(error=>{
+          console.log("error")
+          console.log(error.response)
+        })
     }
   }
   function renderForm() {

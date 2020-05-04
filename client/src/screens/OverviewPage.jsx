@@ -1,9 +1,11 @@
-import React from "react";
-import {useStore, useSelector} from "react-redux"
+import React,{useEffect} from "react";
+import {useStore, useSelector, useDispatch} from "react-redux"
 import {
   Form,
   Card
 } from '../components'
+import axios from 'axios'
+const baseUrl = 'http://localhost:3001/'
 
 let styles = {
   container: {
@@ -19,7 +21,18 @@ let styles = {
 
 export default function OverviewPage() {
   let store = useStore()
+  let dispatch = useDispatch()
   useSelector(state=>state.companiesReducer.companies)
+  useEffect(()=>{
+    axios({
+      url: `${baseUrl}companies`,
+      method: 'GET',
+    })
+      .then(resp=>{
+        console.log(resp)
+        dispatch({type:'getData',payload: resp.data})
+      })
+  },[])
   function checkCompanies() {
     if(store.getState().companiesReducer.companies.length === 0) {
       return (<h4>there is no companies created yet.</h4>)
@@ -29,7 +42,6 @@ export default function OverviewPage() {
       )
     }
   }
-  console.log('ref')
   return (
     <div style={styles.container}>
       <div style={{display: 'flex', justifyContent: 'space-between', margin: '10px'}}>
